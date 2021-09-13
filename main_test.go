@@ -1,60 +1,63 @@
 package main
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 )
 
-func TestReadPostFile(t *testing.T) {
-	path := "post.md"
-	want := `title: Hello Blog
+func TestParsePostFile(t *testing.T) {
+	t.Run("should parse headers", func(t *testing.T) {
+		file := []byte(`title: Hello Blog
 author: Nana
 date: 2021-09-09
 tags: opinion, thoughts
 ---
-Hello Blog`
-	got := convertToSimpleString(ReadPostFile(path))
+`)
+
+		want := Post{
+			Headers{
+				"Hello Blog",
+				"Nana",
+				time.Date(2021, time.September, 9, 0, 0, 0, 0, time.UTC),
+				[]string{"opinion", "thoughts"},
+			},
+			`some text`,
+		}
+
+		got := ParsePostFile(file)
+
+		assertPostHeaders(t, want, got)
+	})
+
+	t.Run("should parse body", func(t *testing.T) {
+		file := []byte(`---
+Hello Blog
+`)
+
+		want := "<p>Hello Blog</p>\n"
+
+		got := ParsePostFile(file)
+
+		assertPostBody(t, want, got.Body)
+	})
+}
+
+func assertPostHeaders(t testing.TB, want, got Post) {
+	t.Helper()
+
+	if reflect.DeepEqual(want.Headers, got.Headers) {
+		t.Errorf("post headers: want %v got %v", want.Headers, got.Headers)
+	}
+}
+
+func assertPostBody(t testing.TB, want, got string) {
+	t.Helper()
 
 	if want != got {
-		t.Errorf("want '%s' got '%s'", want, got)
+		t.Errorf("post body: want %#v got %#v", want, got)
 	}
-}
-
-func TestParsePostFile(t *testing.T) {
-	file := []byte(`title: Hello Blog
-author: Nana
-date: 2021-09-09
-tags: opinion, thoughts
----
-Hello Blog
-These are my thoughts`)
-
-	want := Post{
-		title:  "Hello Blog",
-		author: "Nana",
-		date:   time.Date(2021, time.September, 9, 0, 0, 0, 0, time.UTC),
-		tags:   []string{"opinion", "thoughts"},
-		body:   []string{"Hello Blog", "These are my thoughts"},
-	}
-
-	got := ParsePostFile(file)
-
-	if !assertPost(t, want, got) {
-		t.Errorf("want %v got %v", want, got)
-	}
-}
-
-func assertPost(t testing.TB, want, got Post) bool {
-	t.Helper()
-	switch {
-	case want.title != got.title:
-		return false
-	case want.author != got.author:
-		return false
-	}
-
-	return true
 }
 
 func convertToSimpleString(data []byte) string {
