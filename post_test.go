@@ -1,4 +1,4 @@
-package main
+package logos
 
 import (
 	"reflect"
@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func TestParsePostFile(t *testing.T) {
-	t.Run("should parse headers", func(t *testing.T) {
+func TestNewPost(t *testing.T) {
+	t.Run("should have headers", func(t *testing.T) {
 		file := []byte(`title: Hello Blog
 author: Nana
 date: 2021-09-09
@@ -26,19 +26,23 @@ tags: opinion, thoughts
 			`some text`,
 		}
 
-		got := ParsePostFile(file)
+		got := NewPost(file)
 
 		assertPostHeaders(t, want, got)
 	})
 
-	t.Run("should parse body", func(t *testing.T) {
-		file := []byte(`---
+	t.Run("should have body", func(t *testing.T) {
+		file := []byte(`title: Hello Blog
+author: Nana
+date: 2021-09-09
+tags: opinion, thoughts
+---
 Hello Blog
 `)
 
 		want := "<p>Hello Blog</p>\n"
 
-		got := ParsePostFile(file)
+		got := NewPost(file)
 
 		assertPostBody(t, want, got.Body)
 	})
