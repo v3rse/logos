@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestNewPost(t *testing.T) {
+func TestNewPage(t *testing.T) {
 	t.Run("should have headers", func(t *testing.T) {
 		file := []byte(`title: Hello Blog
 author: Nana
@@ -16,7 +16,7 @@ tags: opinion, thoughts
 ---
 `)
 
-		want := Post{
+		want := Page{
 			Headers{
 				"Hello Blog",
 				"Nana",
@@ -26,9 +26,9 @@ tags: opinion, thoughts
 			`some text`,
 		}
 
-		got := NewPost(file)
+		got := NewPage(file)
 
-		assertPostHeaders(t, want, got)
+		assertPageHeaders(t, want, got)
 	})
 
 	t.Run("should have body", func(t *testing.T) {
@@ -42,13 +42,13 @@ Hello Blog
 
 		want := "<p>Hello Blog</p>\n"
 
-		got := NewPost(file)
+		got := NewPage(file)
 
-		assertPostBody(t, want, got.Body)
+		assertPageBody(t, want, got.Body)
 	})
 }
 
-func assertPostHeaders(t testing.TB, want, got Post) {
+func assertPageHeaders(t testing.TB, want, got Page) {
 	t.Helper()
 
 	if reflect.DeepEqual(want.Headers, got.Headers) {
@@ -56,7 +56,7 @@ func assertPostHeaders(t testing.TB, want, got Post) {
 	}
 }
 
-func assertPostBody(t testing.TB, want, got string) {
+func assertPageBody(t testing.TB, want, got string) {
 	t.Helper()
 
 	if want != got {

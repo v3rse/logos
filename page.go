@@ -19,12 +19,13 @@ type Headers struct {
 	Tags   []string
 }
 
-type Post struct {
+type Page struct {
+	Route   string
 	Headers Headers
 	Body    string
 }
 
-func NewPost(file []byte) Post {
+func NewPage(route string, file []byte) Page {
 	fileParts := bytes.Split(file, []byte(HEADERDELIMITER))
 
 	if len(fileParts) > 2 {
@@ -37,7 +38,8 @@ func NewPost(file []byte) Post {
 	headers := parseHeaders(headerPart)
 	body := parseBody(bodyPart)
 
-	return Post{
+	return Page{
+		route,
 		headers,
 		body,
 	}
